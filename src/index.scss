@@ -1,0 +1,45 @@
+@use './styles/variables' as *;
+:root {
+    --color-orange: #{$color-orange};
+    --color-orange-light: #{$color-orange-light};
+    --color-black: #{$color-black};
+    --color-white: #{$color-white};
+    --color-khaki: #{$color-khaki};
+    --color-gray-dark: #{$color-gray-dark};
+    --color-gray-light: #{$color-gray-light};
+    --color-yellow: #{$color-yellow};
+    --color-green: #{$color-green};
+    --color-catalog: #{$color-catalog};
+    --color-bg: #{$color-bg};
+    --color-blue-light: #a8d4f0;
+    --spacing-unit: #{$spacing-unit};
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: var(--color-black);
+    background: var(--color-white);
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    >main {
+        flex: 1;
+    }
+}

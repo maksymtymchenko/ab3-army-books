@@ -1,0 +1,116 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-family: 'Futura PT', sans-serif;
+    background: $color-white;
+    border-bottom: 1px solid $color-gray-light;
+}
+
+.header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+}
+
+.header__logo {
+    display: flex;
+    flex-shrink: 0;
+    img {
+        display: block;
+        object-fit: contain;
+    }
+}
+
+.header__center {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 560px;
+}
+
+.header__catalog {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: $color-catalog;
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 140%;
+    cursor: pointer;
+    white-space: nowrap;
+    &:hover {
+        filter: brightness(1.05);
+    }
+}
+
+.header__search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    padding: 0.5rem 1rem;
+    background: $color-white;
+    border: 1px solid $color-gray-light;
+    border-radius: 9999px;
+    color: $color-gray-dark;
+}
+
+.header__search-icon {
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.header__search {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    line-height: 140%;
+    &::placeholder {
+        color: $color-gray-dark;
+    }
+}
+
+.header__right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header__reserve {
+    padding: 0.625rem 1.25rem;
+    background: $color-orange;
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 140%;
+    cursor: pointer;
+    white-space: nowrap;
+    &:hover {
+        filter: brightness(1.05);
+    }
+}
+
+.header__crest {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    img {
+        display: block;
+        object-fit: contain;
+    }
+}

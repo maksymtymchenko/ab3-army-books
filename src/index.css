@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* UAF Sans font faces from src/assets/fonts/UAF */
+
+@font-face {
+    font-family: 'UAF Sans';
+    src: url('/src/assets/fonts/UAF/UAFSans-Regular.woff2') format('woff2'), url('/src/assets/fonts/UAF/UAFSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'UAF Sans';
+    src: url('/src/assets/fonts/UAF/UAFSans-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@layer base {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+    html {
+        font-size: 16px;
+    }
+    @media (min-width: 768px) {
+        html {
+            font-size: 16px;
+        }
+    }
+    body {
+        @apply m-0 font-sans text-black antialiased;
+        background-color: #F7F7F7;
+    }
+    #root {
+        min-height: 100vh;
+    }
+}
+
+
+/* Optional: custom scrollbar for carousels */
+
+.scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-gray-light rounded;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-dark rounded;
+}
+
+/* Hide scrollbar but keep scroll (e.g. book carousel) */
+
+.scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Catalog filters: checkbox background #F7931E, tick white */
+.catalog-filters .catalog-filter-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #828A8E;
+    border-radius: 0.25rem;
+    background: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.catalog-filters .catalog-filter-checkbox:checked {
+    background: #F7931E;
+    border-color: #F7931E;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L19 7'/%3E%3C/svg%3E");
+    background-size: 75%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
