@@ -95,6 +95,8 @@ export function BookPage() {
                 src={book.coverUrl}
                 alt={`Обкладинка книги ${book.title}`}
                 className="w-full h-auto object-cover aspect-[152/250] max-h-[400px] object-top"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>

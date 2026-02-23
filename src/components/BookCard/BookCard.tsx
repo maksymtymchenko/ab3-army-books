@@ -75,6 +75,7 @@ export function BookCard({
             alt={`Обкладинка книги ${book.title}`}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
           />
         </div>
       </div>

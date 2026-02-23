@@ -30,6 +30,8 @@ export function Categories() {
             src={cat.icon}
             alt={`Іконка категорії ${cat.name}`}
             className="h-10 w-10 object-contain"
+            loading="lazy"
+            decoding="async"
           />
           <span className="flex-1 text-black text-sm sm:text-figma-20 font-medium leading-snug">
             {cat.name}

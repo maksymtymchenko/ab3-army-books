@@ -107,6 +107,8 @@ export function ReserveBookModal({
               src={book.coverUrl}
               alt={`Обкладинка книги ${book.title}`}
               className="w-full h-full md:h-auto md:aspect-[152/250] object-cover object-top"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div className="text-center min-w-0 flex-1 md:flex-none">

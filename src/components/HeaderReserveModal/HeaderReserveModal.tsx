@@ -37,6 +37,8 @@ function BookResultItem({ book, onClose }: BookResultItemProps) {
           src={book.coverUrl}
           alt={`Обкладинка: ${book.title}`}
           className="w-full h-full object-cover object-top"
+          loading="lazy"
+          decoding="async"
         />
       </div>
       <div className="min-w-0 flex-1">
