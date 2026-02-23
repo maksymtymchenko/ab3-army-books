@@ -71,7 +71,7 @@ export function BookPage() {
             </li>
             <li>
               <Link
-                to={`/#${section.sectionId}`}
+                to={{ pathname: '/', hash: section.sectionId }}
                 className="text-gray-dark no-underline hover:text-black transition-colors"
               >
                 {section.sectionTitle}

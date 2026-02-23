@@ -15,6 +15,36 @@ function ScrollToTop() {
   return null;
 }
 
+/** Selector for sticky app header (used to measure offset for hash scroll). */
+const HEADER_SELECTOR = '[data-app-header]';
+
+function ScrollToHash() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) {
+      return;
+    }
+
+    const id = location.hash.replace('#', '');
+    const el = document.getElementById(id);
+
+    if (!el) {
+      return;
+    }
+
+    const header = document.querySelector(HEADER_SELECTOR);
+    const headerHeight = header instanceof HTMLElement ? header.offsetHeight : 0;
+
+    const top =
+      el.getBoundingClientRect().top + window.scrollY - headerHeight;
+
+    window.scrollTo({ top, left: 0, behavior: 'smooth' });
+  }, [location]);
+
+  return null;
+}
+
 /**
  * App root: router and main layout wrapping all pages.
  */
@@ -22,6 +52,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ScrollToHash />
       <MainLayout>
         <Routes>
           <Route path="/" element={<HomePage />} />

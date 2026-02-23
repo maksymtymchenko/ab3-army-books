@@ -95,7 +95,10 @@ export function Header({ onOpenReserveModal }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-light font-sans">
+    <header
+      data-app-header
+      className="sticky top-0 z-50 bg-white border-b border-gray-light font-sans"
+    >
       <Container className="flex items-center gap-2 md:gap-4 py-3 md:py-4">
         <Logo />
 

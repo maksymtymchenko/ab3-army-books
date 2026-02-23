@@ -101,7 +101,13 @@ export function BookCard({
           <Button
             variant="primary"
             fullWidth
-            className="mt-4 w-full opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200"
+            className={cn(
+              'mt-4 w-full transition-opacity duration-200',
+              // Visible by default on touch devices (no hover). On hover-capable devices, show only on card hover.
+              'opacity-100 pointer-events-auto',
+              '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:pointer-events-none',
+              '[@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-hover:pointer-events-auto'
+            )}
           >
             Забронювати
           </Button>
