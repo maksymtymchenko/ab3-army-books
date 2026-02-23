@@ -55,7 +55,7 @@ export function BookCard({
         <div className="flex w-full justify-start px-4 pt-4 pb-3">
         <span
           className={cn(
-            'inline-flex items-center justify-center px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-xs sm:text-figma-16 font-semibold text-white',
+            'inline-flex items-center justify-center px-3 py-0.5 sm:px-4 sm:py-1 rounded-full text-xs sm:text-figma-16 font-semibold text-white font-futura',
             status.className
           )}
         >
@@ -91,7 +91,7 @@ export function BookCard({
         </h3>
         <p
           className={cn(
-            'm-0 text-sm sm:text-figma-20 text-[#828A8E] leading-snug',
+            'm-0 text-sm sm:text-figma-20 text-[#828A8E] leading-snug font-futura',
             hasReserveButton ? 'mb-2' : 'mb-0'
           )}
         >

@@ -57,7 +57,7 @@ export function BookPage() {
       <Container>
         {/* Breadcrumbs */}
         <nav aria-label="Хлібні крихти" className="mb-4 sm:mb-6">
-          <ol className="list-none m-0 p-0 flex flex-wrap items-center gap-1 text-sm sm:text-figma-20">
+          <ol className="list-none m-0 p-0 flex flex-wrap items-center gap-1 text-sm sm:text-figma-20 font-futura">
             <li>
               <Link
                 to="/"
@@ -105,7 +105,7 @@ export function BookPage() {
           <div className="w-full flex-1 min-w-0 flex flex-col gap-4">
             <span
               className={cn(
-                'inline-flex items-center justify-center px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-figma-16 font-semibold text-white w-fit',
+                'inline-flex items-center justify-center px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-figma-16 font-semibold text-white w-fit font-futura',
                 status.className
               )}
             >
@@ -114,7 +114,7 @@ export function BookPage() {
             <h1 className="m-0 text-[20px] sm:text-2xl md:text-figma-32 font-bold text-black font-display leading-tight">
               {book.title}
             </h1>
-            <p className="m-0 text-sm sm:text-figma-20 text-gray-dark">{book.author}</p>
+            <p className="m-0 text-sm sm:text-figma-20 text-gray-dark font-futura">{book.author}</p>
             {book.description && (
               <p className="m-0 text-sm sm:text-figma-20 text-black leading-relaxed max-w-[600px]">
                 {book.description}

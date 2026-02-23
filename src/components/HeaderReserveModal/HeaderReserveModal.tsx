@@ -45,7 +45,7 @@ function BookResultItem({ book, onClose }: BookResultItemProps) {
         <p className="m-0 text-sm sm:text-figma-16 font-bold text-black leading-tight truncate">
           {book.title}
         </p>
-        <p className="m-0 mt-0.5 text-sm sm:text-figma-16 text-gray-dark leading-tight truncate">
+        <p className="m-0 mt-0.5 text-sm sm:text-figma-16 text-gray-dark leading-tight truncate font-futura">
           {book.author}
         </p>
       </div>
@@ -141,7 +141,7 @@ export function HeaderReserveModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 rounded-full text-orange hover:bg-orange-light transition-colors"
+            className="flex items-center justify-center w-10 h-10 rounded-full text-orange hover:bg-orange-light transition-colors font-futura"
             aria-label="Закрити"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -156,7 +156,7 @@ export function HeaderReserveModal({
           >
             Книга, що чекає саме на вас
           </h2>
-          <p className="m-0 mb-5 text-sm sm:text-figma-16 text-black leading-relaxed">
+          <p className="m-0 mb-5 text-sm sm:text-figma-16 text-black leading-relaxed font-futura">
             Оберіть книгу та залиште заявку — ми подбаємо, щоб вона була готова для вас
           </p>
         </div>

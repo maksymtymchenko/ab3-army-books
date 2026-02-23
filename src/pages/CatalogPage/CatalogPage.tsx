@@ -331,10 +331,10 @@ export function CatalogPage() {
                     className="inline-flex items-center gap-2 pl-4 pr-2 py-2 rounded-full bg-[#E5E5E5] text-[#333333] text-sm sm:text-figma-20 font-normal font-futura"
                   >
                     {label}
-                    <button
+                <button
                       type="button"
                       onClick={() => removeFilter(key)}
-                      className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-black/10 text-black transition-colors"
+                  className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-black/10 text-black transition-colors font-futura"
                       aria-label={`Прибрати фільтр ${label}`}
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -375,7 +375,7 @@ export function CatalogPage() {
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-orange bg-white text-orange hover:bg-orange-light transition disabled:opacity-40 disabled:pointer-events-none"
+                  className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-orange bg-white text-orange hover:bg-orange-light transition disabled:opacity-40 disabled:pointer-events-none font-futura"
                   aria-label="Попередня сторінка"
                 >
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -389,7 +389,7 @@ export function CatalogPage() {
                       type="button"
                       onClick={() => setCurrentPage(page)}
                       className={cn(
-                        'flex items-center justify-center w-[40px] h-[40px] rounded-full bg-white font-sans text-sm sm:text-figma-20 font-medium transition',
+                        'flex items-center justify-center w-[40px] h-[40px] rounded-full bg-white font-display text-sm sm:text-figma-20 font-medium transition',
                         currentPage === page
                           ? 'text-orange'
                           : 'text-black hover:bg-orange-light'
@@ -406,7 +406,7 @@ export function CatalogPage() {
                       type="button"
                       onClick={() => setCurrentPage(totalPages)}
                       className={cn(
-                        'flex items-center justify-center w-[40px] h-[40px] rounded-full bg-white font-sans text-sm sm:text-figma-20 font-medium transition',
+                        'flex items-center justify-center w-[40px] h-[40px] rounded-full bg-white font-display text-sm sm:text-figma-20 font-medium transition',
                         currentPage === totalPages
                           ? 'text-orange'
                           : 'text-black hover:bg-orange-light'
@@ -420,7 +420,7 @@ export function CatalogPage() {
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-orange bg-white text-orange hover:bg-orange-light transition disabled:opacity-40 disabled:pointer-events-none"
+                  className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-orange bg-white text-orange hover:bg-orange-light transition disabled:opacity-40 disabled:pointer-events-none font-futura"
                   aria-label="Наступна сторінка"
                 >
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>

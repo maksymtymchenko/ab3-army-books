@@ -33,7 +33,7 @@ export function Categories() {
             loading="lazy"
             decoding="async"
           />
-          <span className="flex-1 text-black text-sm sm:text-figma-20 font-medium leading-snug">
+          <span className="flex-1 text-black text-sm sm:text-figma-20 font-medium leading-snug font-['UAF_Sans',sans-serif]">
             {cat.name}
           </span>
         </div>

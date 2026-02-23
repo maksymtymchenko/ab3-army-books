@@ -19,7 +19,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type="button"
         className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-full font-medium transition hover:brightness-105 disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center justify-center gap-2 rounded-full font-medium transition hover:brightness-105 disabled:opacity-50 disabled:pointer-events-none font-futura',
           'text-sm sm:text-figma-20 py-2 px-4 sm:py-2.5 sm:px-5',
           variant === 'primary' && 'bg-orange text-white',
           variant === 'catalog' && 'bg-catalog text-white',

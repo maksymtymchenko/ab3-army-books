@@ -23,14 +23,14 @@ export function Hero() {
         >
           Сила слова — для сили духу
         </h1>
-        <p className="text-white text-sm sm:text-base md:text-figma-20 max-w-2xl mx-auto mb-8 opacity-95">
+        <p className="text-white text-sm sm:text-base md:text-figma-20 font-futura max-w-2xl mx-auto mb-8 opacity-95">
           Оберіть книгу, що підтримає, надихне або просто подарує
           <br />
           кілька спокійних годин
         </p>
         <Link
           to="/catalog"
-          className="inline-flex items-center justify-center gap-2 rounded-full font-medium transition hover:brightness-105 bg-orange text-white text-sm sm:text-base md:text-figma-20 px-5 py-2 sm:px-8 sm:py-3"
+          className="inline-flex items-center justify-center gap-2 rounded-full font-medium font-futura transition hover:brightness-105 bg-orange text-white text-sm sm:text-base md:text-figma-20 px-5 py-2 sm:px-8 sm:py-3"
           aria-label="Перейти до каталогу книг"
         >
           Оберіть книгу

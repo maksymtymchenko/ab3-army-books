@@ -92,7 +92,7 @@ export function ReserveBookModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 z-10 flex items-center justify-center w-10 h-10 rounded-full text-orange hover:bg-orange-light transition-colors bg-white/90 sm:bg-transparent"
+          className="absolute top-2 right-2 z-10 flex items-center justify-center w-10 h-10 rounded-full text-orange hover:bg-orange-light transition-colors bg-white/90 sm:bg-transparent font-futura"
           aria-label="Закрити"
         >
           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden>

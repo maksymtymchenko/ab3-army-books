@@ -85,7 +85,7 @@ export function BookSection({
           <div className="flex items-center gap-3 sm:gap-4">
             <a
               href={seeAllHref}
-              className="inline-block text-sm sm:text-figma-16 md:text-figma-20 text-black no-underline border-b border-transparent hover:border-black transition-colors"
+              className="inline-block text-sm sm:text-figma-16 md:text-figma-20 text-black no-underline border-b border-transparent hover:border-black transition-colors font-futura"
             >
               Дивитись всі
             </a>

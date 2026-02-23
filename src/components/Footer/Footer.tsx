@@ -43,7 +43,7 @@ export function Footer({ onOpenReserveModal }: FooterProps) {
               <li key={label}>
                 <a
                   href={href}
-                  className="text-white text-sm sm:text-figma-20 no-underline hover:underline cursor-pointer"
+                  className="text-white text-sm sm:text-figma-20 no-underline hover:underline cursor-pointer font-futura"
                   onClick={handleCategoryClick(label, onOpenReserveModal)}
                   aria-label={`Забронювати книги: ${label}`}
                 >
@@ -57,7 +57,7 @@ export function Footer({ onOpenReserveModal }: FooterProps) {
               <li key={label}>
                 <a
                   href={href}
-                  className="text-white text-sm sm:text-figma-20 no-underline hover:underline cursor-pointer"
+                  className="text-white text-sm sm:text-figma-20 no-underline hover:underline cursor-pointer font-futura"
                   onClick={handleCategoryClick(label, onOpenReserveModal)}
                   aria-label={`Забронювати книги: ${label}`}
                 >
@@ -78,7 +78,7 @@ export function Footer({ onOpenReserveModal }: FooterProps) {
         </div>
       </Container>
       <hr className="border-0 h-px bg-white/20 my-8 w-full max-w-content mx-auto" />
-      <p className="text-center text-xs sm:text-figma-16 text-white/80 m-0">
+      <p className="text-center text-xs sm:text-figma-16 text-white/80 m-0 font-futura">
         © Всі права захищені
       </p>
     </footer>
