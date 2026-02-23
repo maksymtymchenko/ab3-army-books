@@ -51,8 +51,21 @@ export function BookSection({
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
-    const step = 280;
-    el.scrollBy({ left: direction === 'left' ? -step : step, behavior: 'smooth' });
+
+    const firstCard = el.querySelector<HTMLElement>('article');
+    if (!firstCard) return;
+
+    const cardWidth = firstCard.getBoundingClientRect().width;
+    const styles = window.getComputedStyle(el);
+    const gap =
+      parseFloat(styles.columnGap || styles.gap || '0') || 0;
+
+    const step = cardWidth + gap;
+
+    el.scrollBy({
+      left: direction === 'left' ? -step : step,
+      behavior: 'smooth',
+    });
   };
 
   return (
