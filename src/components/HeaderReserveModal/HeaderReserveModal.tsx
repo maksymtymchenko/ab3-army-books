@@ -1,9 +1,12 @@
-import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Book } from 'src/types';
 import { Button, Input } from 'src/components/ui';
-import { searchBooks } from 'src/data/books';
+import { searchBooks as searchBooksApi } from 'src/api';
 import { cn } from 'src/utils/cn';
+
+const SEARCH_DEBOUNCE_MS = 300;
+const MIN_QUERY_LENGTH = 2;
 
 /** Orange magnifying glass icon for the search field. */
 function SearchIcon() {
@@ -77,15 +80,29 @@ export function HeaderReserveModal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const previousActiveRef = useRef<HTMLElement | null>(null);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
     if (open) setSearchQuery(initialSearchQuery);
   }, [open, initialSearchQuery]);
 
-  const searchResults = useMemo(
-    () => searchBooks(searchQuery),
-    [searchQuery]
-  );
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < MIN_QUERY_LENGTH) {
+      setSearchResults([]);
+      return;
+    }
+    const t = setTimeout(() => {
+      setSearchLoading(true);
+      searchBooksApi({ q, limit: 10 })
+        .then((data) => setSearchResults(data.items ?? []))
+        .catch(() => setSearchResults([]))
+        .finally(() => setSearchLoading(false));
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
   const hasResults = searchResults.length > 0;
 
   const handleEscape = useCallback(
@@ -171,20 +188,30 @@ export function HeaderReserveModal({
             wrapperClassName="flex items-center gap-3 flex-1 h-[52px] px-5 py-3 bg-white border border-gray-dark rounded-[30px] text-gray-dark mb-2"
             aria-label="Пошук книг"
           />
-          {hasResults && (
-            <ul className="list-none m-0 p-0 mt-1 flex flex-col border-t border-gray-light max-h-[240px] overflow-y-auto">
-              {searchResults.map((book) => (
-                <li key={book.id} className="border-b border-gray-light last:border-b-0">
-                  <BookResultItem book={book} onClose={onClose} />
-                </li>
-              ))}
-            </ul>
+          {searchQuery.trim().length >= MIN_QUERY_LENGTH && (
+            <>
+              {searchLoading && (
+                <p className="text-sm text-gray-dark mt-1">Пошук…</p>
+              )}
+              {!searchLoading && hasResults && (
+                <ul className="list-none m-0 p-0 mt-1 flex flex-col border-t border-gray-light max-h-[240px] overflow-y-auto">
+                  {searchResults.map((book) => (
+                    <li key={book.id} className="border-b border-gray-light last:border-b-0">
+                      <BookResultItem book={book} onClose={onClose} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {!searchLoading && !hasResults && (
+                <p className="text-sm text-gray-dark mt-1">Нічого не знайдено</p>
+              )}
+            </>
           )}
           <div className="w-full flex justify-center">
             <Button
               type="submit"
               variant="primary"
-              disabled={!hasResults}
+              disabled={searchLoading || !hasResults}
               className={cn(
                 'w-full min-w-0 md:w-auto shrink-0',
                 !hasResults && 'disabled:bg-gray-dark disabled:opacity-100'

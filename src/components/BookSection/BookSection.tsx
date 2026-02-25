@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { Book } from 'src/types';
 import { BookCard } from 'src/components/BookCard';
 import { Container } from 'src/layout/Container';
@@ -83,12 +84,12 @@ export function BookSection({
             {title}
           </h2>
           <div className="flex items-center gap-3 sm:gap-4">
-            <a
-              href={seeAllHref}
+            <Link
+              to={seeAllHref}
               className="inline-block text-sm sm:text-figma-16 md:text-figma-20 text-black no-underline border-b border-transparent hover:border-black transition-colors font-futura"
             >
               Дивитись всі
-            </a>
+            </Link>
             <div className="flex gap-[10px] sm:gap-[15px]" role="group" aria-label="Навігація каруселі">
               <button
                 type="button"

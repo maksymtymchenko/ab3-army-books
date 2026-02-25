@@ -1,26 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import type { BookStatus } from 'src/types';
+import { Link, useSearchParams } from 'react-router-dom';
+import type { Book, BookStatus } from 'src/types';
 import { Container } from 'src/layout/Container';
 import { Button } from 'src/components/ui';
 import { BookCard } from 'src/components/BookCard/BookCard';
-import { catalogBooks } from 'src/data/books';
+import { getCatalogBooks, getBooksFilters } from 'src/api';
+import type { FilterOption } from 'src/api';
 import { cn } from 'src/utils/cn';
 import filterIcon from 'src/assets/catalog/filter_icon.svg';
 import arrowDown from 'src/assets/catalog/arrow_down.svg';
 
 const BOOKS_PER_PAGE = 12;
-const STATUS_LABELS: Record<BookStatus, string> = {
-  in_stock: 'В наявності',
-  reserved: 'Заброньована',
-  issued: 'Видана',
-};
-const DIFFICULTY_OPTIONS = [
-  { id: 'basic', label: 'Базовий' },
-  { id: 'medium', label: 'Середній' },
-  { id: 'advanced', label: 'Поглиблений' },
-] as const;
-
 const SORT_OPTIONS: { value: 'popularity' | 'title'; label: string }[] = [
   { value: 'popularity', label: 'За популярністю' },
   { value: 'title', label: 'За назвою' },
@@ -115,6 +105,30 @@ function SortDropdown({
  * Matches Figma design with author/status/difficulty filters and sort.
  */
 export function CatalogPage() {
+  const [searchParams] = useSearchParams();
+  const rawSection = searchParams.get('section');
+  const section: 'recommended' | 'new' | 'commander' =
+    rawSection === 'recommended' || rawSection === 'new' || rawSection === 'commander'
+      ? rawSection
+      : 'new';
+
+  const SECTION_CONFIG: Record<'recommended' | 'new' | 'commander', { title: string; breadcrumb: string }> =
+    {
+      recommended: {
+        title: 'Рекомендовано до прочитання',
+        breadcrumb: 'Рекомендовано до прочитання',
+      },
+      new: {
+        title: 'Новинки',
+        breadcrumb: 'Новинки',
+      },
+      commander: {
+        title: 'Командир рекомендує',
+        breadcrumb: 'Командир рекомендує',
+      },
+    };
+  const sectionConfig = SECTION_CONFIG[section];
+
   const [authorOpen, setAuthorOpen] = useState(true);
   const [statusOpen, setStatusOpen] = useState(true);
   const [difficultyOpen, setDifficultyOpen] = useState(true);
@@ -126,43 +140,105 @@ export function CatalogPage() {
   const [sortBy, setSortBy] = useState<'popularity' | 'title'>('popularity');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const authors = useMemo(
-    () => Array.from(new Set(catalogBooks.map((b) => b.author))).sort(),
-    []
-  );
+  const [filters, setFilters] = useState<{
+    authors: string[];
+    statuses: FilterOption[];
+    difficulties: FilterOption[];
+  }>({ authors: [], statuses: [], difficulties: [] });
+  const [books, setBooks] = useState<Book[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingFilters, setLoadingFilters] = useState(true);
+  const [loadingBooks, setLoadingBooks] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredBooks = useMemo(() => {
-    let list = [...catalogBooks];
-    if (selectedAuthors.size) {
-      list = list.filter((b) => selectedAuthors.has(b.author));
-    }
-    if (selectedStatuses.size) {
-      list = list.filter((b) => selectedStatuses.has(b.status));
-    }
-    if (sortBy === 'title') {
-      list = [...list].sort((a, b) => a.title.localeCompare(b.title));
-    }
-    return list;
-  }, [selectedAuthors, selectedStatuses, sortBy]);
+  const statusLabelMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    filters.statuses.forEach((s) => {
+      const v = s.value ?? s.id;
+      if (v && s.label) m[v] = s.label;
+    });
+    return m;
+  }, [filters.statuses]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredBooks.length / BOOKS_PER_PAGE));
-  const pageBooks = useMemo(() => {
-    const start = (currentPage - 1) * BOOKS_PER_PAGE;
-    return filteredBooks.slice(start, start + BOOKS_PER_PAGE);
-  }, [filteredBooks, currentPage]);
+  useEffect(() => {
+    setSelectedAuthors(new Set());
+    setSelectedStatuses(new Set());
+    setSelectedDifficulties(new Set());
+    setCurrentPage(1);
+  }, [section]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingFilters(true);
+    getBooksFilters(section)
+      .then((data) => {
+        if (!cancelled) {
+          setFilters({
+            authors: data.authors ?? [],
+            statuses: data.statuses ?? [],
+            difficulties: data.difficulties ?? [],
+          });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFilters({ authors: [], statuses: [], difficulties: [] });
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingFilters(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [section]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingBooks(true);
+    setError(null);
+    getCatalogBooks({
+      page: currentPage,
+      pageSize: BOOKS_PER_PAGE,
+      author: selectedAuthors.size ? Array.from(selectedAuthors) : undefined,
+      status: selectedStatuses.size ? Array.from(selectedStatuses) : undefined,
+      difficulty: selectedDifficulties.size ? Array.from(selectedDifficulties) : undefined,
+      sortBy,
+      section,
+    })
+      .then((data) => {
+        if (!cancelled) {
+          setBooks(data.items ?? []);
+          setTotalItems(data.totalItems ?? 0);
+          setTotalPages(Math.max(1, data.totalPages ?? 1));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err?.message ?? 'Не вдалося завантажити каталог');
+          setBooks([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingBooks(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPage, selectedAuthors, selectedStatuses, selectedDifficulties, sortBy, section]);
+
+  const difficultyOptions = filters.difficulties;
   const activeFilterTags = useMemo(() => {
     const tags: { key: string; label: string }[] = [];
     selectedAuthors.forEach((a) => tags.push({ key: `author-${a}`, label: a }));
     selectedStatuses.forEach((s) =>
-      tags.push({ key: `status-${s}`, label: STATUS_LABELS[s] })
+      tags.push({ key: `status-${s}`, label: statusLabelMap[s] ?? s })
     );
     selectedDifficulties.forEach((d) => {
-      const opt = DIFFICULTY_OPTIONS.find((o) => o.id === d);
+      const opt = difficultyOptions.find((o) => (o.id ?? o.value) === d);
       if (opt) tags.push({ key: `diff-${d}`, label: opt.label });
     });
     return tags;
-  }, [selectedAuthors, selectedStatuses, selectedDifficulties]);
+  }, [selectedAuthors, selectedStatuses, selectedDifficulties, statusLabelMap, difficultyOptions]);
 
   const removeFilter = (key: string) => {
     if (key.startsWith('author-')) {
@@ -226,13 +302,20 @@ export function CatalogPage() {
             Головна
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-black">Новинки</span>
+          <span className="text-black">{sectionConfig.breadcrumb}</span>
         </nav>
 
-        <h1 className="text-[20px] sm:text-2xl md:text-[32px] font-sans font-bold text-black mb-2">Новинки</h1>
+        <h1 className="text-[20px] sm:text-2xl md:text-[32px] font-sans font-bold text-black mb-2">
+          {sectionConfig.title}
+        </h1>
         <p className="text-sm sm:text-figma-20 font-futura text-orange mb-4">
-          Знайдено {filteredBooks.length} книг
+          Знайдено {totalItems} книг
         </p>
+        {error && (
+          <p className="text-red-600 text-sm mb-4" role="alert">
+            {error}
+          </p>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar filters */}
@@ -246,7 +329,7 @@ export function CatalogPage() {
               onToggle={() => setAuthorOpen(!authorOpen)}
             >
               <ul className="max-h-48 overflow-y-auto space-y-2">
-                {authors.map((author) => (
+                {(loadingFilters ? [] : filters.authors).map((author) => (
                   <li key={author} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -272,23 +355,27 @@ export function CatalogPage() {
               onToggle={() => setStatusOpen(!statusOpen)}
             >
               <ul className="space-y-2">
-                {(['in_stock', 'reserved', 'issued'] as const).map((status) => (
-                  <li key={status} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`status-${status}`}
-                      checked={selectedStatuses.has(status)}
-                      onChange={() => toggleStatus(status)}
-                      className="catalog-filter-checkbox rounded border-gray-dark"
-                    />
-                    <label
-                      htmlFor={`status-${status}`}
-                      className="text-sm sm:text-figma-20 font-futura cursor-pointer"
-                    >
-                      {STATUS_LABELS[status]}
-                    </label>
-                  </li>
-                ))}
+                {(loadingFilters ? [] : filters.statuses).map((opt) => {
+                  const status = (opt.value ?? opt.id) as BookStatus;
+                  if (!status) return null;
+                  return (
+                    <li key={status} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={`status-${status}`}
+                        checked={selectedStatuses.has(status)}
+                        onChange={() => toggleStatus(status)}
+                        className="catalog-filter-checkbox rounded border-gray-dark"
+                      />
+                      <label
+                        htmlFor={`status-${status}`}
+                        className="text-sm sm:text-figma-20 font-futura cursor-pointer"
+                      >
+                        {opt.label ?? status}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </Collapsible>
 
@@ -298,20 +385,24 @@ export function CatalogPage() {
               onToggle={() => setDifficultyOpen(!difficultyOpen)}
             >
               <ul className="space-y-2">
-                {DIFFICULTY_OPTIONS.map(({ id, label }) => (
-                  <li key={id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`diff-${id}`}
-                      checked={selectedDifficulties.has(id)}
-                      onChange={() => toggleDifficulty(id)}
-                      className="catalog-filter-checkbox rounded border-gray-dark"
-                    />
-                    <label htmlFor={`diff-${id}`} className="text-sm sm:text-figma-20 font-futura cursor-pointer">
-                      {label}
-                    </label>
-                  </li>
-                ))}
+                {(loadingFilters ? [] : difficultyOptions).map((opt) => {
+                  const id = opt.id ?? opt.value ?? '';
+                  if (!id) return null;
+                  return (
+                    <li key={id} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={`diff-${id}`}
+                        checked={selectedDifficulties.has(id)}
+                        onChange={() => toggleDifficulty(id)}
+                        className="catalog-filter-checkbox rounded border-gray-dark"
+                      />
+                      <label htmlFor={`diff-${id}`} className="text-sm sm:text-figma-20 font-futura cursor-pointer">
+                        {opt.label}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </Collapsible>
 
@@ -349,18 +440,24 @@ export function CatalogPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center sm:justify-items-stretch">
-              {pageBooks.map((book) => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  showReserveButton
-                  sectionId="catalog"
-                  sectionTitle="Новинки"
-                />
-              ))}
+              {loadingBooks ? (
+                <div className="col-span-full py-10 text-center text-gray-dark">
+                  Завантаження…
+                </div>
+              ) : (
+                books.map((book) => (
+                  <BookCard
+                    key={book.id}
+                    book={book}
+                    showReserveButton
+                    sectionId="catalog"
+                    sectionTitle={sectionConfig.title}
+                  />
+                ))
+              )}
             </div>
 
-            {filteredBooks.length === 0 && (
+            {!loadingBooks && books.length === 0 && (
               <p className="text-sm sm:text-figma-20 text-[#828A8E] py-8 text-center">
                 За обраними фільтрами книг не знайдено.
               </p>

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import type { Book } from 'src/types';
 import { Button, Input } from 'src/components/ui';
+import { createReservation, ApiError } from 'src/api';
 import { cn } from 'src/utils/cn';
 
 export interface ReserveBookModalProps {
@@ -10,7 +11,9 @@ export interface ReserveBookModalProps {
   open: boolean;
   /** Called when the modal should close (X, overlay, Escape). */
   onClose: () => void;
-  /** Called when form is submitted (optional; for future API). */
+  /** Called when reservation was created successfully (optional). */
+  onSuccess?: () => void;
+  /** Optional custom submit handler; if not provided, uses API createReservation. */
   onSubmit?: (data: ReserveFormData) => void;
 }
 
@@ -29,10 +32,13 @@ export function ReserveBookModal({
   book,
   open,
   onClose,
+  onSuccess,
   onSubmit,
 }: ReserveBookModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const previousActiveRef = useRef<HTMLElement | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -40,6 +46,10 @@ export function ReserveBookModal({
     },
     [onClose]
   );
+
+  useEffect(() => {
+    if (open) setError(null);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -57,8 +67,9 @@ export function ReserveBookModal({
     if (e.target === overlayRef.current) onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     const form = e.currentTarget;
     const data: ReserveFormData = {
       fullName: (form.elements.namedItem('fullName') as HTMLInputElement).value,
@@ -66,8 +77,35 @@ export function ReserveBookModal({
       subdivision: (form.elements.namedItem('subdivision') as HTMLInputElement).value,
       comment: (form.elements.namedItem('comment') as HTMLTextAreaElement).value,
     };
-    onSubmit?.(data);
-    onClose();
+    if (onSubmit) {
+      onSubmit(data);
+      onClose();
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await createReservation({
+        bookId: book.id,
+        fullName: data.fullName,
+        phone: data.phone,
+        subdivision: data.subdivision,
+        comment: data.comment || undefined,
+      });
+      onSuccess?.();
+      onClose();
+    } catch (err) {
+      const msg =
+        err instanceof ApiError && err.body?.fields
+          ? Object.entries(err.body.fields)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(', ')
+          : err instanceof ApiError
+            ? err.body?.message ?? err.message
+            : (err as Error)?.message ?? 'Помилка бронювання';
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!open) return null;
@@ -132,6 +170,11 @@ export function ReserveBookModal({
           <p className="m-0 mb-4 text-sm sm:text-figma-16 text-gray-dark">
             Заповніть форму, щоб забронювати книгу
           </p>
+          {error && (
+            <p className="m-0 mb-2 text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <Input
               name="fullName"
@@ -161,8 +204,14 @@ export function ReserveBookModal({
               className="w-full rounded-[30px] border border-gray-dark py-3 px-6 text-sm sm:text-figma-20 text-black placeholder:text-gray-dark outline-none resize-none min-h-[80px]"
               autoComplete="off"
             />
-            <Button type="submit" variant="primary" fullWidth className="mt-1">
-              Забронювати
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              className="mt-1"
+              disabled={submitting}
+            >
+              {submitting ? 'Відправка…' : 'Забронювати'}
             </Button>
           </form>
         </div>

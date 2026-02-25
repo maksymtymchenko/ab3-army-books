@@ -1,9 +1,10 @@
 /**
- * Category for the categories grid on the home page.
+ * Category for the categories grid on the home page (matches API).
  */
 export interface Category {
   id: string;
   name: string;
-  icon: string;
+  /** URL to category icon (from API: iconUrl). */
+  iconUrl: string;
   href?: string;
 }

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import type { BookStatus } from 'src/types';
 import { Container } from 'src/layout/Container';
 import { Button } from 'src/components/ui';
 import { ReserveBookModal } from 'src/components/ReserveBookModal';
-import { getBookById } from 'src/data/books';
+import { getBook, ApiError } from 'src/api';
+import type { Book } from 'src/types';
 import { cn } from 'src/utils/cn';
 
 const statusConfig: Record<BookStatus, { label: string; className: string }> = {
@@ -33,9 +34,41 @@ export function BookPage() {
     state?.sectionId != null && state?.sectionTitle != null
       ? { sectionId: state.sectionId, sectionTitle: state.sectionTitle }
       : DEFAULT_SECTION;
-  const book = id ? getBookById(id) : undefined;
 
-  if (!book) {
+  const [book, setBook] = useState<Book | null>(null);
+  const [loading, setLoading] = useState(!!id);
+  const [error, setError] = useState<string | null>(null);
+  const [reserveModalOpen, setReserveModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!id) {
+      setBook(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    getBook(id)
+      .then((data) => {
+        if (!cancelled) setBook(data);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setBook(null);
+          setError(err instanceof ApiError && err.status === 404 ? 'Книгу не знайдено.' : err?.message ?? 'Помилка завантаження');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (!id) {
     return (
       <div className="py-18 bg-white">
         <Container>
@@ -48,9 +81,31 @@ export function BookPage() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="py-18 bg-white">
+        <Container>
+          <p className="text-sm sm:text-figma-20 text-gray-dark">Завантаження…</p>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error || !book) {
+    return (
+      <div className="py-18 bg-white">
+        <Container>
+          <p className="text-sm sm:text-figma-20 text-gray-dark">{error ?? 'Книгу не знайдено.'}</p>
+          <Link to="/" className="text-orange underline mt-4 inline-block">
+            На головну
+          </Link>
+        </Container>
+      </div>
+    );
+  }
+
   const status = statusConfig[book.status];
   const isInStock = book.status === 'in_stock';
-  const [reserveModalOpen, setReserveModalOpen] = useState(false);
 
   return (
     <div className="py-4 sm:py-6 pb-8 sm:pb-10 bg-white min-h-[60vh]">

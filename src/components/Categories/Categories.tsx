@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
 import type { Category } from 'src/types';
 import { Container } from 'src/layout/Container';
 import { useReserveModal } from 'src/layout/MainLayout/MainLayout';
-import { categories } from 'src/data/categories';
+import { getCategories } from 'src/api';
 
 /**
  * Categories list section using pill-like cards from Figma.
@@ -9,6 +10,26 @@ import { categories } from 'src/data/categories';
  */
 export function Categories() {
   const openReserveModal = useReserveModal();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCategories()
+      .then((data) => {
+        if (!cancelled) setCategories(data.items ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setCategories([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const firstRow = categories.slice(0, 4);
   const secondRow = categories.slice(4);
 
@@ -27,7 +48,7 @@ export function Categories() {
       >
         <div className="flex h-[100px] items-center gap-4 px-5 bg-orange-light border border-orange rounded-lg">
           <img
-            src={cat.icon}
+            src={cat.iconUrl}
             alt={`Іконка категорії ${cat.name}`}
             className="h-10 w-10 object-contain"
             loading="lazy"
@@ -47,15 +68,21 @@ export function Categories() {
         <h2 id="categories-heading" className="sr-only">
           Категорії книг
         </h2>
-        {/* First row: 4 items */}
-        <ul className="flex flex-col md:flex-row md:flex-nowrap gap-4 sm:gap-5 list-none m-0 p-0 mb-4">
-          {firstRow.map(renderCategoryCard)}
-        </ul>
+        {loading ? (
+          <p className="text-sm text-gray-dark py-4">Завантаження категорій…</p>
+        ) : (
+          <>
+            {/* First row: 4 items */}
+            <ul className="flex flex-col md:flex-row md:flex-nowrap gap-4 sm:gap-5 list-none m-0 p-0 mb-4">
+              {firstRow.map(renderCategoryCard)}
+            </ul>
 
-        {/* Second row: 3 items, therefore naturally a bit wider */}
-        <ul className="flex flex-col md:flex-row md:flex-nowrap gap-4 sm:gap-5 list-none m-0 p-0">
-          {secondRow.map(renderCategoryCard)}
-        </ul>
+            {/* Second row: 3 items, therefore naturally a bit wider */}
+            <ul className="flex flex-col md:flex-row md:flex-nowrap gap-4 sm:gap-5 list-none m-0 p-0">
+              {secondRow.map(renderCategoryCard)}
+            </ul>
+          </>
+        )}
       </Container>
     </section>
   );
