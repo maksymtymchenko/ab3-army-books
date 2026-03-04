@@ -75,6 +75,26 @@ export function BookPage() {
     };
   }, [id]);
 
+  // When the book is reserved, periodically refetch to reflect backend status changes (e.g. issued) without reload.
+  useEffect(() => {
+    if (!id || !book || book.status !== 'reserved') {
+      return;
+    }
+    const intervalId = window.setInterval(() => {
+      getBook(id)
+        .then((data) => {
+          setBook(data);
+        })
+        .catch(() => {
+          // Ignore polling errors; next tick may succeed.
+        });
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [id, book?.status]);
+
   if (!id) {
     return (
       <div className="py-18 bg-white">
