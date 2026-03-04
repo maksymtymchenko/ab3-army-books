@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import type { Book } from 'src/types';
+import type { ReservationBookInfo } from 'src/api';
 import { Button, Input } from 'src/components/ui';
 import { createReservation, ApiError } from 'src/api';
 import { cn } from 'src/utils/cn';
@@ -11,8 +12,8 @@ export interface ReserveBookModalProps {
   open: boolean;
   /** Called when the modal should close (X, overlay, Escape). */
   onClose: () => void;
-  /** Called when reservation was created successfully (optional). */
-  onSuccess?: () => void;
+  /** Called when reservation was created successfully (optional). Receives updated book status. */
+  onSuccess?: (updatedBook: ReservationBookInfo) => void;
   /** Optional custom submit handler; if not provided, uses API createReservation. */
   onSubmit?: (data: ReserveFormData) => void;
 }
@@ -84,14 +85,14 @@ export function ReserveBookModal({
     }
     setSubmitting(true);
     try {
-      await createReservation({
+      const response = await createReservation({
         bookId: book.id,
         fullName: data.fullName,
         phone: data.phone,
         subdivision: data.subdivision,
         comment: data.comment || undefined,
       });
-      onSuccess?.();
+      onSuccess?.(response.book);
       onClose();
     } catch (err) {
       const msg =

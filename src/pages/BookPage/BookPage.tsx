@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import type { BookStatus } from 'src/types';
+import type { BookStatus, Book } from 'src/types';
+import type { ReservationBookInfo } from 'src/api';
 import { Container } from 'src/layout/Container';
 import { Button } from 'src/components/ui';
 import { ReserveBookModal } from 'src/components/ReserveBookModal';
 import { getBook, ApiError } from 'src/api';
-import type { Book } from 'src/types';
 import { cn } from 'src/utils/cn';
 
 const statusConfig: Record<BookStatus, { label: string; className: string }> = {
@@ -39,6 +39,13 @@ export function BookPage() {
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState<string | null>(null);
   const [reserveModalOpen, setReserveModalOpen] = useState(false);
+
+  const handleReservationSuccess = (updatedBook: ReservationBookInfo) => {
+    setBook((prev) => {
+      if (!prev || prev.id !== updatedBook.id) return prev;
+      return { ...prev, status: updatedBook.status };
+    });
+  };
 
   useEffect(() => {
     if (!id) {
@@ -190,6 +197,7 @@ export function BookPage() {
         book={book}
         open={reserveModalOpen}
         onClose={() => setReserveModalOpen(false)}
+        onSuccess={handleReservationSuccess}
       />
     </div>
   );
