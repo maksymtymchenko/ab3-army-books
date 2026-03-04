@@ -112,7 +112,11 @@ export async function getCatalogBooks(params: CatalogBooksParams = {}): Promise<
     q.author = Array.isArray(params.author) ? params.author : [params.author];
   }
   if (params.status != null) {
-    q.status = Array.isArray(params.status) ? params.status : [params.status];
+    const statuses = Array.isArray(params.status) ? params.status : [params.status];
+    // Send both singular and plural keys to be compatible with backend implementations
+    // that may expect either `status` or `statuses` as the query parameter name.
+    q.status = statuses;
+    q.statuses = statuses;
   }
   if (params.difficulty != null) {
     q.difficulty = Array.isArray(params.difficulty) ? params.difficulty : [params.difficulty];
