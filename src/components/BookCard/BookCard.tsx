@@ -80,12 +80,7 @@ export function BookCard({
         </div>
       </div>
 
-      <div
-        className={cn(
-          'w-full px-6 transition-all duration-200',
-          hasReserveButton ? 'pb-6' : 'pb-0'
-        )}
-      >
+      <div className="w-full px-6 pb-6 transition-all duration-200">
         <h3 className="m-0 mb-1 text-base sm:text-figma-20 font-bold text-[#001527] leading-snug line-clamp-2">
           {book.title}
         </h3>
