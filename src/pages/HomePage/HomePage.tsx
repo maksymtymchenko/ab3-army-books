@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Hero } from 'src/components/Hero/Hero';
 import { Categories } from 'src/components/Categories/Categories';
 import { BookSection } from 'src/components/BookSection/BookSection';
@@ -9,6 +10,8 @@ import type { Book } from 'src/types';
  * Home page: hero, categories grid, three book carousels.
  */
 export function HomePage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [recommended, setRecommended] = useState<Book[]>([]);
   const [newArrivals, setNewArrivals] = useState<Book[]>([]);
   const [commanderRecommends, setCommanderRecommends] = useState<Book[]>([]);
@@ -28,7 +31,14 @@ export function HomePage() {
         }
       })
       .catch((err) => {
-        if (!cancelled) setError(err?.message ?? 'Не вдалося завантажити дані');
+        if (!cancelled) {
+          const message = err?.message ?? 'Не вдалося завантажити дані';
+          if (message === 'Failed to fetch') {
+            navigate('/error', { replace: true, state: { from: location.pathname } });
+            return;
+          }
+          setError(message);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -36,7 +46,7 @@ export function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [navigate, location.pathname]);
 
   if (error) {
     return (

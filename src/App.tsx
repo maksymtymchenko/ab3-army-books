@@ -4,6 +4,7 @@ import { MainLayout } from 'src/layout/MainLayout';
 import { HomePage } from 'src/pages/HomePage';
 import { CatalogPage } from 'src/pages/CatalogPage';
 import { BookPage } from 'src/pages/BookPage';
+import { ErrorPage } from 'src/pages/ErrorPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -73,6 +74,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/book/:id" element={<BookPage />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>

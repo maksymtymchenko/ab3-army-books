@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import type { BookStatus, Book } from 'src/types';
 import type { ReservationBookInfo } from 'src/api';
 import { Container } from 'src/layout/Container';
@@ -29,6 +29,7 @@ export interface BookPageState {
 export function BookPage() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const state = location.state as BookPageState | null | undefined;
   const section =
     state?.sectionId != null && state?.sectionTitle != null
@@ -64,7 +65,15 @@ export function BookPage() {
       .catch((err) => {
         if (!cancelled) {
           setBook(null);
-          setError(err instanceof ApiError && err.status === 404 ? 'Книгу не знайдено.' : err?.message ?? 'Помилка завантаження');
+          const message =
+            err instanceof ApiError && err.status === 404
+              ? 'Книгу не знайдено.'
+              : err?.message ?? 'Помилка завантаження';
+          if (message === 'Failed to fetch') {
+            navigate('/error', { replace: true, state: { from: location.pathname } });
+          } else {
+            setError(message);
+          }
         }
       })
       .finally(() => {
@@ -73,7 +82,7 @@ export function BookPage() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, navigate, location.pathname]);
 
   // When the book is reserved, periodically refetch to reflect backend status changes (e.g. issued) without reload.
   useEffect(() => {

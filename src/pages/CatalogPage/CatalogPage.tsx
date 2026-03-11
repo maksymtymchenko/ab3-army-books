@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { Book, BookStatus } from 'src/types';
 import { Container } from 'src/layout/Container';
 import { Button } from 'src/components/ui';
@@ -105,6 +105,8 @@ function SortDropdown({
  * Matches Figma design with author/status/difficulty filters and sort.
  */
 export function CatalogPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const rawSection = searchParams.get('section');
   const section: 'recommended' | 'new' | 'commander' =
@@ -214,8 +216,13 @@ export function CatalogPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err?.message ?? 'Не вдалося завантажити каталог');
-          setBooks([]);
+          const message = err?.message ?? 'Не вдалося завантажити каталог';
+          if (message === 'Failed to fetch') {
+            navigate('/error', { replace: true, state: { from: location.pathname } });
+          } else {
+            setError(message);
+            setBooks([]);
+          }
         }
       })
       .finally(() => {
@@ -224,7 +231,7 @@ export function CatalogPage() {
     return () => {
       cancelled = true;
     };
-  }, [currentPage, selectedAuthors, selectedStatuses, selectedDifficulties, sortBy, section]);
+  }, [currentPage, selectedAuthors, selectedStatuses, selectedDifficulties, sortBy, section, navigate, location.pathname]);
 
   const difficultyOptions = filters.difficulties;
   const activeFilterTags = useMemo(() => {
