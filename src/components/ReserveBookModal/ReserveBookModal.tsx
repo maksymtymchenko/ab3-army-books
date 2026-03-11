@@ -40,6 +40,21 @@ export function ReserveBookModal({
   const previousActiveRef = useRef<HTMLElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formValues, setFormValues] = useState<ReserveFormData>({
+    fullName: '',
+    phone: '',
+    subdivision: '',
+    comment: '',
+  });
+  const [touched, setTouched] = useState<{
+    fullName: boolean;
+    phone: boolean;
+    subdivision: boolean;
+  }>({
+    fullName: false,
+    phone: false,
+    subdivision: false,
+  });
 
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -49,7 +64,20 @@ export function ReserveBookModal({
   );
 
   useEffect(() => {
-    if (open) setError(null);
+    if (open) {
+      setError(null);
+      setFormValues({
+        fullName: '',
+        phone: '',
+        subdivision: '',
+        comment: '',
+      });
+      setTouched({
+        fullName: false,
+        phone: false,
+        subdivision: false,
+      });
+    }
   }, [open]);
 
   useEffect(() => {
@@ -68,15 +96,31 @@ export function ReserveBookModal({
     if (e.target === overlayRef.current) onClose();
   };
 
+  const isFullNameValid = formValues.fullName.trim().length > 0;
+  const isPhoneValid = formValues.phone.trim().length > 0;
+  const isSubdivisionValid = formValues.subdivision.trim().length > 0;
+  const isFormValid = isFullNameValid && isPhoneValid && isSubdivisionValid;
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    const form = e.currentTarget;
+
+    setTouched({
+      fullName: true,
+      phone: true,
+      subdivision: true,
+    });
+
+    if (!isFormValid) {
+      setError("Заповніть обов'язкові поля: ПІБ, Телефон і Підрозділ.");
+      return;
+    }
+
     const data: ReserveFormData = {
-      fullName: (form.elements.namedItem('fullName') as HTMLInputElement).value,
-      phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
-      subdivision: (form.elements.namedItem('subdivision') as HTMLInputElement).value,
-      comment: (form.elements.namedItem('comment') as HTMLTextAreaElement).value,
+      fullName: formValues.fullName.trim(),
+      phone: formValues.phone.trim(),
+      subdivision: formValues.subdivision.trim(),
+      comment: formValues.comment.trim(),
     };
     if (onSubmit) {
       onSubmit(data);
@@ -179,27 +223,79 @@ export function ReserveBookModal({
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <Input
               name="fullName"
+              value={formValues.fullName}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, fullName: e.target.value }))
+              }
+              onBlur={() =>
+                setTouched((prev) => ({
+                  ...prev,
+                  fullName: true,
+                }))
+              }
               placeholder="ПІБ (Псевдо)"
               required
               className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
               autoComplete="name"
             />
+            {touched.fullName && !isFullNameValid && (
+              <p className="m-0 -mt-2 text-xs sm:text-sm text-red-600">
+                Вкажіть ПІБ.
+              </p>
+            )}
             <Input
               name="phone"
               type="tel"
+              value={formValues.phone}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, phone: e.target.value }))
+              }
+              onBlur={() =>
+                setTouched((prev) => ({
+                  ...prev,
+                  phone: true,
+                }))
+              }
               placeholder="Телефон (на якому є What's up/Signal)"
               required
               className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
               autoComplete="tel"
             />
+            {touched.phone && !isPhoneValid && (
+              <p className="m-0 -mt-2 text-xs sm:text-sm text-red-600">
+                Вкажіть телефон.
+              </p>
+            )}
             <Input
               name="subdivision"
+              value={formValues.subdivision}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  subdivision: e.target.value,
+                }))
+              }
+              onBlur={() =>
+                setTouched((prev) => ({
+                  ...prev,
+                  subdivision: true,
+                }))
+              }
               placeholder="Підрозділ"
               required
               className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
             />
+            {touched.subdivision && !isSubdivisionValid && (
+              <p className="m-0 -mt-2 text-xs sm:text-sm text-red-600">
+                Вкажіть підрозділ.
+              </p>
+            )}
             <textarea
               name="comment"
+              value={formValues.comment}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, comment: e.target.value }))
+              }
               placeholder="Коментар (не обов'язково до заповнення)"
               rows={3}
               className="w-full rounded-[30px] border border-gray-dark py-3 px-6 text-sm sm:text-figma-20 text-black placeholder:text-gray-dark outline-none resize-none min-h-[80px]"
@@ -210,7 +306,7 @@ export function ReserveBookModal({
               variant="primary"
               fullWidth
               className="mt-1"
-              disabled={submitting}
+              disabled={submitting || !isFormValid}
             >
               {submitting ? 'Відправка…' : 'Забронювати'}
             </Button>
