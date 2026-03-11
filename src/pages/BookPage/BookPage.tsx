@@ -88,7 +88,7 @@ export function BookPage() {
         .catch(() => {
           // Ignore polling errors; next tick may succeed.
         });
-    }, 5000);
+    }, 5 * 60 * 1000);
 
     return () => {
       window.clearInterval(intervalId);
