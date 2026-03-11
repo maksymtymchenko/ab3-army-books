@@ -69,7 +69,13 @@ export function Categories() {
           Категорії книг
         </h2>
         {loading ? (
-          <p className="text-sm text-gray-dark py-4">Завантаження категорій…</p>
+          <div className="flex items-center gap-2 py-6 text-gray-dark" aria-live="polite">
+            <span
+              className="inline-flex h-4 w-4 rounded-full border-2 border-gray-300 border-t-orange animate-spin"
+              aria-hidden="true"
+            />
+            <span className="text-sm">Завантажуємо категорії…</span>
+          </div>
         ) : (
           <>
             {/* First row: 4 items */}
