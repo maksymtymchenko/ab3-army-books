@@ -235,7 +235,7 @@ export function ReserveBookModal({
               }
               placeholder="ПІБ (Псевдо)"
               required
-              className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
+              className="font-sans rounded-[30px] border border-gray-dark py-3 px-6 text-sm sm:text-figma-20 text-black placeholder:text-gray-dark"
               autoComplete="name"
             />
             {touched.fullName && !isFullNameValid && (
@@ -258,7 +258,7 @@ export function ReserveBookModal({
               }
               placeholder="Телефон (на якому є What's up/Signal)"
               required
-              className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
+              className="font-sans rounded-[30px] border border-gray-dark py-3 px-6 text-sm sm:text-figma-20 text-black placeholder:text-gray-dark"
               autoComplete="tel"
             />
             {touched.phone && !isPhoneValid && (
@@ -283,7 +283,7 @@ export function ReserveBookModal({
               }
               placeholder="Підрозділ"
               required
-              className="rounded-[30px] border border-gray-dark py-3 px-6 placeholder:text-gray-dark"
+              className="font-sans rounded-[30px] border border-gray-dark py-3 px-6 text-sm sm:text-figma-20 text-black placeholder:text-gray-dark"
             />
             {touched.subdivision && !isSubdivisionValid && (
               <p className="m-0 -mt-2 text-xs sm:text-sm text-red-600">
